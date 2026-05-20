@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exodus Admin — Panel de Control</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='22' fill='%23FFFF00' font-family='sans-serif' font-weight='900'>X</text></svg>" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;900&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black:       #000000;
+      --yellow:      #FFFF00;
+      --yellow-dim:  rgba(255,255,0,0.10);
+      --yellow-glow: rgba(255,255,0,0.30);
+      --purple:      #9B30FF;
+      --white:       #ffffff;
+      --gray:        #aaaaaa;
+      --gray-dark:   #333333;
+      --card-bg:     #0d0d0d;
+      --border:      #222222;
+      --border-bright: #3a3a3a;
+      --danger:      #ff4444;
+      --success:     #00cc66;
+      --f-title:     'Anton', sans-serif;
+      --f-body:      'Inter', sans-serif;
+      --ease:        0.22s ease;
+      --radius-sm:   6px;
+      --radius:      10px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--f-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 500;
+      background: rgba(0,0,0,0.96);
+      border-bottom: 2px solid var(--yellow);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.8rem 2rem;
+      gap: 1rem;
+      box-shadow: 0 4px 30px rgba(255,255,0,0.10);
+    }
+    .topbar-brand {
+      display: flex; align-items: center; gap: 0.9rem;
+    }
+    .topbar-x {
+      width: 36px; height: 36px;
+      background: var(--yellow);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--f-title);
+      font-size: 1.3rem; color: #000;
+      box-shadow: 3px 3px 0 rgba(255,255,0,0.3);
+    }
+    .topbar-title {
+      font-family: var(--f-title);
+      font-size: 1.1rem; letter-spacing: 3px;
+      color: var(--yellow);
+      text-shadow: 0 0 20px var(--yellow-glow);
+    }
+    .topbar-sub { font-size: 0.6rem; letter-spacing: 0.25em; color: var(--gray); text-transform: uppercase; }
+
+    .topbar-actions { display: flex; gap: 0.6rem; align-items: center; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--f-body); font-weight: 700;
+      font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.6rem 1.3rem; border: none; cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all var(--ease);
+    }
+    .btn-y { background: var(--yellow); color: #000; box-shadow: 3px 3px 0 rgba(0,0,0,0.8); }
+    .btn-y:hover { transform: translateY(-2px); box-shadow: 5px 5px 0 #000; }
+    .btn-outline { background: transparent; color: var(--gray); border: 1px solid var(--border-bright); }
+    .btn-outline:hover { border-color: var(--yellow); color: var(--yellow); }
+    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.66rem; }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex; flex: 1;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 220px; min-height: calc(100vh - 61px);
+      background: #050505;
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      flex-shrink: 0;
+      position: sticky; top: 61px; align-self: flex-start;
+    }
+    .sidebar-section {
+      padding: 0.4rem 1.2rem;
+      font-size: 0.52rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: #444;
+      margin-bottom: 0.3rem;
+    }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.65rem 1.4rem;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
+      color: var(--gray); cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all var(--ease);
+      text-decoration: none;
+    }
+    .sidebar-link:hover { color: var(--white); background: rgba(255,255,255,0.03); }
+    .sidebar-link.active { color: var(--yellow); border-left-color: var(--yellow); background: var(--yellow-dim); }
+    .sidebar-link svg { flex-shrink: 0; opacity: 0.7; }
+    .sidebar-link.active svg { opacity: 1; }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1; padding: 2rem 2.5rem;
+      min-width: 0;
+    }
+
+    /* ── PAGE ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap;
+    }
+    .page-title {
+      font-family: var(--f-title);
+      font-size: 2rem; letter-spacing: 2px;
+      color: var(--yellow);
+      text-shadow: 0 0 24px var(--yellow-glow);
+    }
+    .page-sub { font-size: 0.75rem; color: var(--gray); margin-top: 0.3rem; letter-spacing: 0.05em; }
+
+    /* ── PRODUCTOS GRID ── */
+    .prod-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .prod-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color var(--ease), box-shadow var(--ease);
+    }
+    .prod-card:hover { border-color: #444; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+    .prod-card.sold-out-card { opacity: 0.6; }
+    .prod-card.sold-out-card .card-sold-indicator {
+      background: var(--danger);
+    }
+
+    .card-img-wrap {
+      position: relative; height: 180px; overflow: hidden;
+      background: #111;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .prod-card:hover .card-img-wrap img { transform: scale(1.04); }
+    .card-img-placeholder {
+      font-size: 3rem; opacity: 0.2;
+    }
+    .card-sold-indicator {
+      position: absolute; top: 10px; right: 10px;
+      font-size: 0.55rem; font-weight: 900; letter-spacing: 0.2em;
+      text-transform: uppercase; padding: 0.25rem 0.6rem;
+      border-radius: 3px; background: var(--gray-dark); color: #fff;
+    }
+    .card-tipo-badge {
+      position: absolute; top: 10px; left: 10px;
+      font-size: 0.55rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; padding: 0.25rem 0.6rem;
+      border-radius: 3px; background: rgba(155,48,255,0.85); color: #fff;
+    }
+
+    .card-body { padding: 1rem 1.1rem; }
+    .card-nombre {
+      font-weight: 900; font-size: 0.95rem; margin-bottom: 0.25rem;
+      color: var(--white);
+    }
+    .card-color { font-size: 0.7rem; color: var(--gray); margin-bottom: 0.7rem; }
+    .card-precio-row {
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem;
+    }
+    .card-precio-antes {
+      font-size: 0.7rem; color: #555;
+      text-decoration: line-through;
+    }
+    .card-precio-oferta {
+      font-size: 1rem; font-weight: 900; color: var(--yellow);
+    }
+    .card-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* ── MODAL EDITOR ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 900;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: var(--radius);
+      width: 100%; max-width: 620px;
+      max-height: 90vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,0,0.08);
+      animation: modalIn 0.22s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-header {
+      padding: 1.2rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title {
+      font-family: var(--f-title);
+      font-size: 1.2rem; letter-spacing: 2px; color: var(--yellow);
+    }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--gray); font-size: 1.4rem; line-height: 1;
+      transition: color var(--ease);
+    }
+    .modal-close:hover { color: var(--white); }
+    .modal-body {
+      padding: 1.4rem; overflow-y: auto; flex: 1;
+    }
+    .modal-footer {
+      padding: 1rem 1.4rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 0.6rem;
+    }
+
+    /* ── FORM ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gray);
+    }
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      background: #111; border: 1px solid var(--border-bright);
+      color: var(--white); font-family: var(--f-body); font-size: 0.85rem;
+      padding: 0.6rem 0.8rem; border-radius: var(--radius-sm);
+      transition: border-color var(--ease), box-shadow var(--ease);
+      outline: none; width: 100%;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 2px rgba(255,255,0,0.10);
+    }
+    textarea { resize: vertical; min-height: 70px; }
+    select option { background: #111; }
+
+    .toggle-row {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.7rem 0;
+    }
+    .toggle-label { font-size: 0.8rem; font-weight: 600; flex: 1; }
+    .toggle {
+      position: relative; width: 42px; height: 24px; flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0; cursor: pointer;
+      background: #333; border-radius: 24px;
+      transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 18px; height: 18px; left: 3px; top: 3px;
+      background: #666; border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--danger); }
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(18px); background: #fff;
+    }
+    .toggle input:not(:checked) + .toggle-slider { background: var(--success); }
+    .toggle input:not(:checked) + .toggle-slider::before { background: #fff; }
+
+    /* ── FOTOS ── */
+    .fotos-section { margin-top: 1rem; }
+    .fotos-section-title {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gray); margin-bottom: 0.6rem;
+    }
+    .fotos-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .foto-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: #111; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 0.5rem 0.7rem;
+    }
+    .foto-row input { flex: 1; background: transparent; border: none; padding: 0.2rem 0; }
+    .foto-row input:focus { box-shadow: none; border-bottom: 1px solid var(--yellow); }
+    .foto-preview {
+      width: 40px; height: 40px; object-fit: cover;
+      border-radius: 4px; border: 1px solid #333; flex-shrink: 0;
+      background: #1a1a1a;
+    }
+    .foto-del {
+      background: none; border: none; cursor: pointer;
+      color: #555; font-size: 1rem; transition: color var(--ease); flex-shrink: 0;
+    }
+    .foto-del:hover { color: var(--danger); }
+    .add-foto-btn {
+      background: none; border: 1px dashed #333; color: #555;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.5rem;
+      border-radius: var(--radius-sm); cursor: pointer; width: 100%;
+      transition: all var(--ease);
+    }
+    .add-foto-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+
+    /* ── TALLES ── */
+    .talles-row {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem;
+    }
+    .talle-chip {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      background: #1a1a1a; border: 1px solid var(--border-bright);
+      border-radius: 4px; padding: 0.35rem 0.7rem;
+      font-size: 0.72rem; font-weight: 700;
+    }
+    .talle-chip-del {
+      background: none; border: none; cursor: pointer;
+      color: #555; font-size: 0.9rem; transition: color var(--ease);
+      line-height: 1;
+    }
+    .talle-chip-del:hover { color: var(--danger); }
+    .add-talle-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .add-talle-row input { flex: 1; }
+
+    /* ── NUEVO PRODUCTO ── */
+    .add-prod-card {
+      background: transparent;
+      border: 2px dashed #2a2a2a;
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0.6rem;
+      min-height: 280px; cursor: pointer;
+      color: #444; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      transition: all var(--ease);
+    }
+    .add-prod-card:hover { border-color: var(--yellow); color: var(--yellow); }
+    .add-prod-card svg { opacity: 0.5; transition: opacity var(--ease); }
+    .add-prod-card:hover svg { opacity: 1; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--yellow); color: #000;
+      font-weight: 900; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.7rem 1.8rem; border-radius: 4px; z-index: 9999;
+      box-shadow: 4px 4px 0 #000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #toast.error { background: var(--danger); color: #fff; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── SETTINGS PAGE ── */
+    .settings-grid { display: flex; flex-direction: column; gap: 1.2rem; }
+    .settings-section {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.4rem;
+    }
+    .settings-section-title {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--purple);
+      margin-bottom: 1rem;
+    }
+
+    /* ── INSTRUCCIONES ── */
+    .instructions {
+      background: rgba(155,48,255,0.07);
+      border: 1px solid rgba(155,48,255,0.25);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .instructions-title {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--purple); margin-bottom: 0.7rem;
+    }
+    .instructions p { font-size: 0.8rem; color: var(--gray); line-height: 1.7; }
+    .instructions code {
+      background: rgba(255,255,255,0.07); padding: 0.15rem 0.4rem;
+      border-radius: 3px; font-size: 0.75rem; color: var(--yellow);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { padding: 1.2rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .topbar { padding: 0.7rem 1rem; }
+      .topbar-sub { display: none; }
+    }
+
+    /* ── CONFIRM DIALOG ── */
+    .confirm-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.92);
+      display: none; align-items: center; justify-content: center;
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box {
+      background: #0a0a0a; border: 1px solid #333;
+      border-radius: var(--radius); padding: 2rem;
+      max-width: 380px; width: 90%; text-align: center;
+    }
+    .confirm-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+    .confirm-msg { font-size: 0.9rem; color: var(--gray); margin-bottom: 1.5rem; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 0.7rem; justify-content: center; }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--black);
+      display: flex; align-items: center; justify-content: center;
+    }
+    #login-screen.hidden { display: none; }
+    .login-box {
+      background: #0a0a0a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 2.5rem 2rem;
+      width: 100%; max-width: 360px;
+      display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,0,0.06);
+    }
+    .login-logo {
+      width: 52px; height: 52px;
+      background: var(--yellow);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--f-title); font-size: 1.8rem; color: #000;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
+    }
+    .login-title {
+      font-family: var(--f-title); font-size: 1.3rem;
+      letter-spacing: 3px; color: var(--yellow);
+      text-shadow: 0 0 20px var(--yellow-glow); text-align: center;
+    }
+    .login-sub {
+      font-size: 0.62rem; letter-spacing: 0.2em; color: #444;
+      text-transform: uppercase; margin-top: -0.6rem; text-align: center;
+    }
+    .login-field { width: 100%; display: flex; flex-direction: column; gap: 0.4rem; }
+    .login-field label {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.25em;
+      text-transform: uppercase; color: #555;
+    }
+    .login-field input {
+      width: 100%; background: #111;
+      border: 1px solid #2a2a2a; border-radius: 6px;
+      color: var(--white); font-family: var(--f-body);
+      font-size: 1rem; padding: 0.75rem 1rem;
+      outline: none; letter-spacing: 0.08em;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .login-field input:focus {
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 2px rgba(255,255,0,0.10);
+    }
+    .login-btn {
+      width: 100%; padding: 0.85rem;
+      background: var(--yellow); color: #000;
+      font-family: var(--f-body); font-weight: 900;
+      font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+      border: none; border-radius: 6px; cursor: pointer;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.8);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 5px 5px 0 #000; }
+    .login-btn:active { transform: translateY(0); box-shadow: 2px 2px 0 #000; }
+    .login-error {
+      font-size: 0.7rem; color: var(--danger); font-weight: 700;
+      letter-spacing: 0.1em; min-height: 1.2em; text-align: center;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .login-error.show { opacity: 1; }
+
+    /* ── EXPORT ── */
+    .export-box {
+      background: #050505; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1rem;
+      font-family: monospace; font-size: 0.72rem; color: #8a8a8a;
+      white-space: pre-wrap; word-break: break-all;
+      max-height: 200px; overflow-y: auto; margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════
+     PANTALLA DE VERIFICACIÓN (mientras chequea el token)
+═══════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">X</div>
+    <div>
+      <div class="login-title">EXODUS ADMIN</div>
+      <div class="login-sub">Verificando acceso...</div>
+    </div>
+    <div style="width:32px;height:32px;border:3px solid #222;border-top-color:#FFFF00;border-radius:50%;animation:spin 0.7s linear infinite;margin:0.5rem auto;"></div>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+  </div>
+</div>
+<div id="toast"></div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-msg" id="confirmMsg">¿Estás seguro?</div>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" id="confirmNo">Cancelar</button>
+      <button class="btn btn-danger" id="confirmYes">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITOR -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">EDITAR PRODUCTO</span>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- dinámico -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="modalCancel">Cancelar</button>
+      <button class="btn btn-y" id="modalSave">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-x">X</div>
+    <div>
+      <div class="topbar-title">EXODUS ADMIN</div>
+      <div class="topbar-sub">Panel de control</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-outline btn-sm" onclick="exportJSON()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar datos
+    </button>
+    <a href="index.html" target="_blank" class="btn btn-outline btn-sm">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Ver sitio
+    </a>
+    <button class="btn btn-y btn-sm" onclick="saveAll()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Guardar todo
+    </button>
+    <button class="btn btn-outline btn-sm" onclick="cerrarSesion()" title="Cerrar sesión" style="color:#666; border-color:#333;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Salir
+    </button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">Catálogo</div>
+    <a class="sidebar-link active" onclick="showPage('productos')" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Productos
+    </a>
+    <div class="sidebar-section" style="margin-top:1rem;">Configuración</div>
+    <a class="sidebar-link" onclick="showPage('textos')" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Textos del sitio
+    </a>
+    <a class="sidebar-link" onclick="showPage('ayuda')" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Cómo usar
+    </a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- PAGE: PRODUCTOS -->
+    <div class="page active" id="page-productos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">PRODUCTOS</div>
+          <div class="page-sub" id="prod-count">Cargando...</div>
+        </div>
+        <button class="btn btn-y" onclick="openNewProductModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Agregar producto
+        </button>
+      </div>
+      <div class="prod-grid" id="prod-grid">
+        <!-- dinámico -->
+      </div>
+    </div>
+
+    <!-- PAGE: TEXTOS -->
+    <div class="page" id="page-textos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">TEXTOS DEL SITIO</div>
+          <div class="page-sub">Editá los textos principales sin tocar el código</div>
+        </div>
+        <button class="btn btn-y" onclick="saveTextos()">Guardar textos</button>
+      </div>
+      <div class="settings-grid" id="textos-form">
+        <!-- dinámico -->
+      </div>
+    </div>
+
+    <!-- PAGE: AYUDA -->
+    <div class="page" id="page-ayuda">
+      <div class="page-header">
+        <div>
+          <div class="page-title">CÓMO USAR</div>
+          <div class="page-sub">Guía rápida del panel admin</div>
+        </div>
+      </div>
+      <div class="instructions">
+        <div class="instructions-title">📋 Paso a paso</div>
+        <p>
+          <strong style="color:#fff;">1. Editá productos:</strong> Hacé clic en "Editar" en cualquier producto para cambiar nombre, precio, fotos, descripción y más.<br><br>
+          <strong style="color:#fff;">2. Agregá productos:</strong> Usá el botón "Agregar producto" para sumar nuevos artículos al catálogo.<br><br>
+          <strong style="color:#fff;">3. Marcá agotados:</strong> Activá el toggle "Agotado" en el editor para ocultar el botón de compra en la web.<br><br>
+          <strong style="color:#fff;">4. Fotos:</strong> Escribí el nombre del archivo de imagen (ej: <code>img/mi-foto.webp</code>). Las fotos deben estar en la carpeta <code>img/</code> de tu sitio.<br><br>
+          <strong style="color:#fff;">5. Guardá:</strong> Usá "Guardar cambios" en el editor o "Guardar todo" en la barra superior.<br><br>
+          <strong style="color:#fff;">6. Ver en la web:</strong> Hacé clic en <strong style="color:#FFFF00;">"Ver sitio"</strong> en la barra superior — el index carga los cambios automáticamente.
+        </p>
+      </div>
+      <div class="instructions" style="background:rgba(255,255,0,0.05); border-color:rgba(255,255,0,0.2);">
+        <div class="instructions-title" style="color:var(--yellow);">⚡ Importante — Cómo funciona</div>
+        <p>
+          Los datos se guardan en el <strong style="color:#fff;">localStorage</strong> del navegador. Ambos archivos (<code>admin.html</code> e <code>index.html</code>) deben estar en la <strong style="color:#fff;">misma carpeta</strong> y abrirse desde el mismo servidor o directamente desde el disco (file://).<br><br>
+          Si el sitio está subido a un hosting, abrí ambos desde el mismo dominio. Si trabajás en local, abrí ambos desde la misma carpeta.<br><br>
+          Para llevar los datos a otro dispositivo, usá <strong style="color:#fff;">"Exportar datos"</strong> → descargá el JSON → guardalo de respaldo.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATOS INICIALES (los productos del index)
+// ═══════════════════════════════════════════
+const STORAGE_KEY = 'exodus_admin_data';
+const TEXTOS_KEY  = 'exodus_admin_textos';
+
+const defaultProductos = [
+  {
+    id: 1,
+    nombre: 'Ice Baggy',
+    color: 'Celeste',
+    tipo: 'baggy',
+    desc: 'Denim celeste, corte ancho. Calce baggy real con caída perfecta.',
+    precioAntes: 40000,
+    precioOferta: 35000,
+    talles: ['38','40','42','44'],
+    fotos: ['img/ice-baggy.webp'],
+    agotado: false,
+    badge: 'New',
+    badgeTipo: 'b-new',
+    estrella: false
+  },
+  {
+    id: 2,
+    nombre: 'Baggy Raven',
+    color: 'Negro',
+    tipo: 'baggy',
+    desc: 'Denim negro, corte ancho. El clásico que nunca falla.',
+    precioAntes: 40000,
+    precioOferta: 35000,
+    talles: ['38','40','42','44'],
+    fotos: ['img/baggy-raven.webp'],
+    agotado: false,
+    badge: 'Más pedido',
+    badgeTipo: 'b-hot',
+    estrella: false
+  },
+  {
+    id: 3,
+    nombre: 'Baggy Flame Batic',
+    color: 'Negro / Gris',
+    tipo: 'baggy',
+    desc: 'Pantalón negro con tonos grises y bordados llama en los bolsillos traseros.',
+    precioAntes: 50000,
+    precioOferta: 45000,
+    talles: ['38','40','42','44'],
+    fotos: ['img/baggy-flame-batic-delantero.webp','img/baggy-flame-batic-trasero.webp'],
+    agotado: true,
+    badge: 'Edición única',
+    badgeTipo: 'b-new',
+    estrella: false
+  },
+  {
+    id: 4,
+    nombre: 'Baggy Calavera',
+    color: 'Negro',
+    tipo: 'baggy',
+    desc: 'Corte ancho con tres bordados exclusivos. Heaven Can Wait.',
+    precioAntes: 50000,
+    precioOferta: 45000,
+    talles: ['38','40','42','44'],
+    fotos: ['img/baggy-calavera-delantero.webp','img/baggy-calavera-trasero.webp'],
+    agotado: false,
+    badge: 'New',
+    badgeTipo: 'b-new',
+    estrella: false
+  },
+  {
+    id: 5,
+    nombre: 'Buzo Boxy Fit',
+    color: 'Verde Cemento',
+    tipo: 'buzo',
+    desc: 'Corte cuadrado y tela pesada. Bordado en pecho, estampa grande en espalda.',
+    precioAntes: 40000,
+    precioOferta: 35000,
+    talles: ['S','M','L','XL'],
+    fotos: ['img/buzo-boxy-fit-pecho.webp','img/buzo-boxy-fit-espalda.webp'],
+    agotado: true,
+    badge: 'New',
+    badgeTipo: 'b-new',
+    estrella: false
+  },
+  {
+    id: 6,
+    nombre: 'Buzo Pasamontañas',
+    color: 'Gris · Detalle cruz en cierre',
+    tipo: 'buzo',
+    desc: 'Capucha total pasamontañas, cierre con dije de cruz. La pieza estrella del drop.',
+    precioAntes: 55000,
+    precioOferta: 47000,
+    talles: ['S','M','L','XL'],
+    fotos: ['img/buzo-pasamontañas.webp','img/buzo-pasamontañas-detalle.webp','img/idea-outfit-pasamontañas.webp','img/idea-outfit-pasamontañas1.webp'],
+    agotado: false,
+    badge: 'Estrella',
+    badgeTipo: 'b-star',
+    estrella: true
+  }
+];
+
+const defaultTextos = {
+  heroTag: 'Bariloche, Patagonia — Drop 2026',
+  heroTitulo: 'Tu fit empieza acá',
+  heroSubtitulo: 'Streetwear Argentino · Stock real en Bariloche',
+  heroDesc: 'Lo que está de moda, disponible ahora mismo en Bariloche. Sin esperas, sin excusas.',
+  anuncio: '🔥 OFERTA OTOÑAL · ENTREGAS EN BARILOCHE Y ENVÍOS A TODO EL PAÍS 🔥',
+  catTitulo: 'Drop 2026',
+  catDesc: 'Prendas seleccionadas por calce, calidad y estilo. Disponibles en Bariloche, entrega en el día.',
+  wppNumero: '542944229279',
+};
+
+// ══════════════════════
+//  STATE
+// ══════════════════════
+let productos = [];
+let textos    = {};
+let editingId = null;
+let editingFotos = [];
+let editingTalles = [];
+let nextId = 100;
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    productos = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(defaultProductos));
+    const rawT = localStorage.getItem(TEXTOS_KEY);
+    textos = rawT ? JSON.parse(rawT) : Object.assign({}, defaultTextos);
+    nextId = Math.max(...productos.map(p => p.id), 99) + 1;
+  } catch(e) {
+    productos = JSON.parse(JSON.stringify(defaultProductos));
+    textos = Object.assign({}, defaultTextos);
+  }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
+  localStorage.setItem(TEXTOS_KEY, JSON.stringify(textos));
+  // Notificar a otras pestañas (index.html) que hay datos nuevos
+  try {
+    localStorage.setItem('exodus_admin_updated', Date.now().toString());
+  } catch(e) {}
+}
+
+// ══════════════════════
+//  PAGES
+// ══════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  if (id === 'textos') renderTextos();
+}
+
+// ══════════════════════
+//  RENDER PRODUCTOS
+// ══════════════════════
+function fmt(n) {
+  return '$' + parseInt(n).toLocaleString('es-AR');
+}
+
+function descuento(antes, oferta) {
+  return Math.round((1 - oferta / antes) * 100);
+}
+
+function renderProductos() {
+  const grid = document.getElementById('prod-grid');
+  document.getElementById('prod-count').textContent =
+    productos.length + ' producto' + (productos.length !== 1 ? 's' : '');
+
+  grid.innerHTML = '';
+
+  productos.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'prod-card' + (p.agotado ? ' sold-out-card' : '');
+
+    const imgSrc = p.fotos && p.fotos.length ? p.fotos[0] : '';
+
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        ${imgSrc
+          ? `<img src="${imgSrc}" alt="${p.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+          : ''}
+        <div class="card-img-placeholder" ${imgSrc ? 'style="display:none"' : ''}>📷</div>
+        <span class="card-sold-indicator">${p.agotado ? 'AGOTADO' : 'EN STOCK'}</span>
+        <span class="card-tipo-badge">${p.tipo}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-nombre">${p.nombre}</div>
+        <div class="card-color">${p.color}</div>
+        <div class="card-precio-row">
+          <span class="card-precio-antes">${fmt(p.precioAntes)}</span>
+          <span class="card-precio-oferta">${fmt(p.precioOferta)}</span>
+          <span style="font-size:0.65rem;color:#666;">−${descuento(p.precioAntes,p.precioOferta)}%</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-outline btn-sm" onclick="openEditModal(${p.id})">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete(${p.id})">Eliminar</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Card "agregar"
+  const addCard = document.createElement('div');
+  addCard.className = 'add-prod-card';
+  addCard.onclick = openNewProductModal;
+  addCard.innerHTML = `
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Agregar nuevo producto
+  `;
+  grid.appendChild(addCard);
+}
+
+// ══════════════════════
+//  MODAL EDITAR
+// ══════════════════════
+function buildModalHTML(p) {
+  editingFotos = p ? [...p.fotos] : [''];
+  editingTalles = p ? [...p.talles] : [];
+
+  const fotosHTML = () => editingFotos.map((f, i) => `
+    <div class="foto-row" data-foto-idx="${i}">
+      <img class="foto-preview" src="${f}" onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\'><rect width=\\'40\\' height=\\'40\\' fill=\\'%23111\\'/></svg>'" />
+      <input type="text" value="${f}" placeholder="img/nombre-foto.webp" onchange="updateFoto(${i}, this.value)" oninput="updateFotoPreview(${i}, this.value)" />
+      <label class="btn btn-outline btn-sm" title="Subir imagen desde tu dispositivo" style="cursor:pointer;padding:0.35rem 0.7rem;">
+        📁
+        <input type="file" accept="image/*" style="display:none;" onchange="uploadFotoBase64(${i}, this)" />
+      </label>
+      <button class="foto-del" onclick="deleteFoto(${i})" title="Eliminar foto">×</button>
+    </div>
+  `).join('');
+
+  const tallesHTML = () => editingTalles.map((t, i) => `
+    <span class="talle-chip">${t}<button class="talle-chip-del" onclick="deleteTalle(${i})">×</button></span>
+  `).join('');
+
+  return `
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nombre del producto</label>
+        <input type="text" id="f-nombre" value="${p ? p.nombre : ''}" placeholder="Ej: Baggy Raven" />
+      </div>
+      <div class="form-group">
+        <label>Color / Variante</label>
+        <input type="text" id="f-color" value="${p ? p.color : ''}" placeholder="Ej: Negro" />
+      </div>
+      <div class="form-group">
+        <label>Tipo de prenda</label>
+        <select id="f-tipo">
+          <option value="baggy"  ${p && p.tipo==='baggy'  ? 'selected':''}>Baggy</option>
+          <option value="buzo"   ${p && p.tipo==='buzo'   ? 'selected':''}>Buzo</option>
+          <option value="remera" ${p && p.tipo==='remera' ? 'selected':''}>Remera</option>
+          <option value="otro"   ${p && p.tipo==='otro'   ? 'selected':''}>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Badge (etiqueta)</label>
+        <input type="text" id="f-badge" value="${p ? p.badge : 'New'}" placeholder="Ej: New, Más pedido, Estrella" />
+      </div>
+      <div class="form-group">
+        <label>Precio anterior (sin puntos)</label>
+        <input type="number" id="f-antes" value="${p ? p.precioAntes : ''}" placeholder="50000" />
+      </div>
+      <div class="form-group">
+        <label>Precio oferta (sin puntos)</label>
+        <input type="number" id="f-oferta" value="${p ? p.precioOferta : ''}" placeholder="45000" />
+      </div>
+      <div class="form-group full">
+        <label>Descripción corta</label>
+        <textarea id="f-desc" placeholder="Descripción de la prenda...">${p ? p.desc : ''}</textarea>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">Estado del producto</span>
+      <label class="toggle" title="Verde = En stock | Rojo = Agotado">
+        <input type="checkbox" id="f-agotado" ${p && p.agotado ? 'checked' : ''} />
+        <span class="toggle-slider"></span>
+      </label>
+      <span id="toggle-text" style="font-size:0.7rem;color:var(--gray);">${p && p.agotado ? '⛔ Agotado' : '✅ En stock'}</span>
+    </div>
+
+    <!-- TALLES -->
+    <div class="fotos-section">
+      <div class="fotos-section-title">Talles disponibles</div>
+      <div class="talles-row" id="talles-container">
+        ${tallesHTML()}
+      </div>
+      <div class="add-talle-row">
+        <input type="text" id="new-talle-input" placeholder="Ej: 42 o XL" style="max-width:120px;" onkeydown="if(event.key==='Enter'){addTalle();event.preventDefault();}" />
+        <button class="btn btn-outline btn-sm" onclick="addTalle()">+ Agregar talle</button>
+      </div>
+    </div>
+
+    <!-- FOTOS -->
+    <div class="fotos-section" style="margin-top:1.4rem;">
+      <div class="fotos-section-title">Fotos del producto</div>
+      <div class="fotos-list" id="fotos-container">
+        ${fotosHTML()}
+      </div>
+      <button class="add-foto-btn" onclick="addFoto()" style="margin-top:0.5rem;">+ Agregar foto</button>
+      <p style="font-size:0.65rem;color:#555;margin-top:0.5rem;">Escribí la ruta relativa desde el index.html, ej: <code style="color:#888;">img/mi-prenda.webp</code></p>
+    </div>
+  `;
+}
+
+function openEditModal(id) {
+  const p = productos.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'EDITAR PRODUCTO';
+  document.getElementById('modalBody').innerHTML = buildModalHTML(p);
+  setupToggle();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function openNewProductModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'NUEVO PRODUCTO';
+  document.getElementById('modalBody').innerHTML = buildModalHTML(null);
+  setupToggle();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function setupToggle() {
+  const chk = document.getElementById('f-agotado');
+  const txt = document.getElementById('toggle-text');
+  chk.addEventListener('change', () => {
+    txt.textContent = chk.checked ? '⛔ Agotado' : '✅ En stock';
+  });
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId = null;
+}
+
+// Fotos
+function updateFoto(idx, val) {
+  editingFotos[idx] = val;
+}
+function updateFotoPreview(idx, val) {
+  const rows = document.querySelectorAll('[data-foto-idx]');
+  const img = rows[idx] && rows[idx].querySelector('img.foto-preview');
+  if (img) img.src = val;
+}
+function deleteFoto(idx) {
+  editingFotos.splice(idx, 1);
+  refreshFotos();
+}
+function addFoto() {
+  editingFotos.push('');
+  refreshFotos();
+}
+function refreshFotos() {
+  document.getElementById('fotos-container').innerHTML = editingFotos.map((f, i) => `
+    <div class="foto-row" data-foto-idx="${i}">
+      <img class="foto-preview" src="${f}" onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\'><rect width=\\'40\\' height=\\'40\\' fill=\\'%23111\\'/></svg>'" />
+      <input type="text" value="${f}" placeholder="img/nombre-foto.webp" onchange="updateFoto(${i}, this.value)" oninput="updateFotoPreview(${i}, this.value)" />
+      <label class="btn btn-outline btn-sm" title="Subir imagen desde tu dispositivo" style="cursor:pointer;padding:0.35rem 0.7rem;">
+        📁
+        <input type="file" accept="image/*" style="display:none;" onchange="uploadFotoBase64(${i}, this)" />
+      </label>
+      <button class="foto-del" onclick="deleteFoto(${i})" title="Eliminar">×</button>
+    </div>
+  `).join('');
+}
+
+function uploadFotoBase64(idx, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    editingFotos[idx] = e.target.result;
+    refreshFotos();
+  };
+  reader.readAsDataURL(file);
+}
+
+// Talles
+function deleteTalle(idx) {
+  editingTalles.splice(idx, 1);
+  refreshTalles();
+}
+function addTalle() {
+  const inp = document.getElementById('new-talle-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  editingTalles.push(val);
+  inp.value = '';
+  refreshTalles();
+}
+function refreshTalles() {
+  document.getElementById('talles-container').innerHTML = editingTalles.map((t, i) => `
+    <span class="talle-chip">${t}<button class="talle-chip-del" onclick="deleteTalle(${i})">×</button></span>
+  `).join('');
+}
+
+// GUARDAR MODAL
+function saveModal() {
+  const nombre  = document.getElementById('f-nombre').value.trim();
+  const color   = document.getElementById('f-color').value.trim();
+  const tipo    = document.getElementById('f-tipo').value;
+  const badge   = document.getElementById('f-badge').value.trim();
+  const antes   = parseInt(document.getElementById('f-antes').value) || 0;
+  const oferta  = parseInt(document.getElementById('f-oferta').value) || 0;
+  const desc    = document.getElementById('f-desc').value.trim();
+  const agotado = document.getElementById('f-agotado').checked;
+
+  if (!nombre) { toast('Escribí el nombre del producto', true); return; }
+  if (!oferta) { toast('Ingresá el precio de oferta', true); return; }
+
+  const fotos  = editingFotos.filter(f => f.trim() !== '');
+  const talles = [...editingTalles];
+
+  if (editingId !== null) {
+    const idx = productos.findIndex(p => p.id === editingId);
+    if (idx !== -1) {
+      productos[idx] = { ...productos[idx], nombre, color, tipo, badge, precioAntes: antes, precioOferta: oferta, desc, agotado, fotos, talles };
+    }
+  } else {
+    productos.push({ id: nextId++, nombre, color, tipo, badge, badgeTipo: 'b-new', precioAntes: antes, precioOferta: oferta, desc, agotado, fotos, talles, estrella: false });
+  }
+
+  saveData();
+  renderProductos();
+  closeModal();
+  toast(editingId ? '✅ Producto actualizado' : '✅ Producto agregado');
+}
+
+// ══════════════════════
+//  ELIMINAR
+// ══════════════════════
+let confirmCallback = null;
+
+function confirmDelete(id) {
+  const p = productos.find(x => x.id === id);
+  document.getElementById('confirmMsg').textContent = `¿Eliminás "${p ? p.nombre : 'este producto'}"? Esta acción no se puede deshacer.`;
+  confirmCallback = () => {
+    productos = productos.filter(x => x.id !== id);
+    saveData();
+    renderProductos();
+    toast('🗑️ Producto eliminado');
+  };
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+document.getElementById('confirmYes').onclick = () => {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  if (confirmCallback) { confirmCallback(); confirmCallback = null; }
+};
+document.getElementById('confirmNo').onclick = () => {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  confirmCallback = null;
+};
+
+// ══════════════════════
+//  TEXTOS
+// ══════════════════════
+const textosConfig = [
+  { key: 'heroTag',      label: 'Hero — Tag superior',      placeholder: 'Bariloche, Patagonia — Drop 2026' },
+  { key: 'heroTitulo',   label: 'Hero — Título principal',  placeholder: 'Tu fit empieza acá' },
+  { key: 'heroSubtitulo',label: 'Hero — Subtítulo',         placeholder: 'Streetwear Argentino · Stock real' },
+  { key: 'heroDesc',     label: 'Hero — Descripción',       placeholder: 'Descripción del hero...', textarea: true },
+  { key: 'anuncio',      label: 'Barra de anuncio',         placeholder: '🔥 OFERTA · ENTREGAS EN BARILOCHE...', textarea: true },
+  { key: 'catTitulo',    label: 'Catálogo — Título',        placeholder: 'Drop 2026' },
+  { key: 'catDesc',      label: 'Catálogo — Descripción',   placeholder: 'Descripción del catálogo...', textarea: true },
+  { key: 'wppNumero',    label: 'Número de WhatsApp',       placeholder: '542944229279' },
+];
+
+function renderTextos() {
+  const el = document.getElementById('textos-form');
+  el.innerHTML = `
+    <div class="settings-section">
+      <div class="settings-section-title">Textos editables</div>
+      ${textosConfig.map(t => `
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label>${t.label}</label>
+          ${t.textarea
+            ? `<textarea id="txt-${t.key}" placeholder="${t.placeholder}">${textos[t.key] || ''}</textarea>`
+            : `<input type="text" id="txt-${t.key}" value="${textos[t.key] || ''}" placeholder="${t.placeholder}" />`
+          }
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function saveTextos() {
+  textosConfig.forEach(t => {
+    const el = document.getElementById('txt-' + t.key);
+    if (el) textos[t.key] = el.value;
+  });
+  saveData();
+  toast('✅ Textos guardados');
+}
+
+// ══════════════════════
+//  SAVE ALL
+// ══════════════════════
+function saveAll() {
+  // Si estamos en la página de textos, guardar esos también
+  textosConfig.forEach(t => {
+    const el = document.getElementById('txt-' + t.key);
+    if (el) textos[t.key] = el.value;
+  });
+  saveData();
+  toast('✅ Todo guardado correctamente');
+}
+
+// ══════════════════════
+//  EXPORT JSON
+// ══════════════════════
+function exportJSON() {
+  const data = { productos, textos };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'exodus-datos.json';
+  a.click(); URL.revokeObjectURL(url);
+  toast('📦 Datos exportados');
+}
+
+// ══════════════════════
+//  TOAST
+// ══════════════════════
+let toastTimer;
+function toast(msg, error = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = error ? 'error show' : 'show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.classList.remove('show'); }, 2800);
+}
+
+// ══════════════════════
+//  CERRAR SESIÓN
+// ══════════════════════
+function cerrarSesion() {
+  sessionStorage.removeItem('exodus_admin_token');
+  window.location.href = '/index.html';
+}
+
+// ══════════════════════
+//  VERIFICAR TOKEN AL CARGAR
+// ══════════════════════
+(function() {
+  const loginScreen = document.getElementById('login-screen');
+
+  // Ocultar todo el panel mientras verificamos
+  document.querySelector('.topbar').style.visibility = 'hidden';
+  document.querySelector('.layout').style.visibility = 'hidden';
+
+  const token = sessionStorage.getItem('exodus_admin_token');
+
+  if (!token) {
+    // Sin token → volver al index
+    window.location.href = '/index.html';
+    return;
+  }
+
+  // Verificar token con la función de Netlify
+  fetch('/.netlify/functions/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.valid) {
+      // Token válido → mostrar panel
+      loginScreen.classList.add('hidden');
+      document.querySelector('.topbar').style.visibility = '';
+      document.querySelector('.layout').style.visibility = '';
+      loadData();
+      renderProductos();
+    } else {
+      // Token inválido o expirado → volver al index
+      sessionStorage.removeItem('exodus_admin_token');
+      window.location.href = '/index.html';
+    }
+  })
+  .catch(() => {
+    // Error de red → mostrar mensaje en la pantalla de login
+    loginScreen.classList.remove('hidden');
+    document.querySelector('.topbar').style.visibility = '';
+    document.querySelector('.layout').style.visibility = '';
+    const loginBox = loginScreen.querySelector('.login-box');
+    loginBox.innerHTML = `
+      <div class="login-logo">X</div>
+      <div class="login-title" style="font-size:1rem;">Error de conexión</div>
+      <p style="font-size:0.78rem;color:#666;text-align:center;line-height:1.6;">
+        No se pudo conectar con el servidor.<br>
+        Verificá tu conexión a internet.
+      </p>
+      <button class="login-btn" onclick="window.location.reload()">Reintentar</button>
+      <button onclick="window.location.href='/index.html'" style="background:none;border:none;color:#444;font-size:0.65rem;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;font-weight:700;">Volver al sitio</button>
+    `;
+  });
+})();
+
+// ══════════════════════
+//  MODAL EVENTS
+// ══════════════════════
+document.getElementById('modalClose').onclick   = closeModal;
+document.getElementById('modalCancel').onclick  = closeModal;
+document.getElementById('modalSave').onclick    = saveModal;
+document.getElementById('modalOverlay').onclick = e => { if (e.target === document.getElementById('modalOverlay')) closeModal(); };
+
+</script>
+</body>
+</html>
