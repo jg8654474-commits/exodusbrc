@@ -2749,6 +2749,7 @@ document.querySelectorAll('.carrusel').forEach(function(car) {
       var rawT = localStorage.getItem(TEXTOS_KEY);
       data   = raw  ? JSON.parse(raw)  : null;
       textos = rawT ? JSON.parse(rawT) : null;
+      if (Array.isArray(data)) data = { productos: data };
     } catch(e) {
       return;
     }
