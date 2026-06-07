@@ -1,0 +1,152 @@
+{
+  "productos": [
+    {
+      "id": 1,
+      "nombre": "Ice Baggy",
+      "color": "Celeste",
+      "tipo": "baggy",
+      "desc": "Denim celeste, corte ancho. Calce baggy real con caída perfecta.",
+      "precioAntes": 40000,
+      "precioOferta": 35000,
+      "talles": [
+        "38",
+        "40",
+        "42",
+        "44"
+      ],
+      "fotos": [
+        "img/ice-baggy.webp"
+      ],
+      "agotado": false,
+      "badge": "New",
+      "badgeTipo": "b-new",
+      "estrella": false
+    },
+    {
+      "id": 2,
+      "nombre": "Baggy Raven",
+      "color": "Negro",
+      "tipo": "baggy",
+      "desc": "Denim negro, corte ancho. El clásico que nunca falla.",
+      "precioAntes": 40000,
+      "precioOferta": 35000,
+      "talles": [
+        "38",
+        "40",
+        "42",
+        "44"
+      ],
+      "fotos": [
+        "img/baggy-raven.webp"
+      ],
+      "agotado": false,
+      "badge": "Más pedido",
+      "badgeTipo": "b-hot",
+      "estrella": false
+    },
+    {
+      "id": 3,
+      "nombre": "Baggy Flame Batic",
+      "color": "Negro / Gris",
+      "tipo": "baggy",
+      "desc": "Pantalón negro con tonos grises y bordados llama en los bolsillos traseros.",
+      "precioAntes": 50000,
+      "precioOferta": 45000,
+      "talles": [
+        "38",
+        "40",
+        "42",
+        "44"
+      ],
+      "fotos": [
+        "img/baggy-flame-batic-delantero.webp",
+        "img/baggy-flame-batic-trasero.webp"
+      ],
+      "agotado": true,
+      "badge": "Edición única",
+      "badgeTipo": "b-new",
+      "estrella": false
+    },
+    {
+      "id": 4,
+      "nombre": "Baggy Calavera",
+      "color": "Negro",
+      "tipo": "baggy",
+      "desc": "Corte ancho con tres bordados exclusivos. Heaven Can Wait.",
+      "precioAntes": 50000,
+      "precioOferta": 45000,
+      "talles": [
+        "38",
+        "40",
+        "42",
+        "44"
+      ],
+      "fotos": [
+        "img/baggy-calavera-delantero.webp",
+        "img/baggy-calavera-trasero.webp"
+      ],
+      "agotado": false,
+      "badge": "New",
+      "badgeTipo": "b-new",
+      "estrella": false
+    },
+    {
+      "id": 5,
+      "nombre": "Buzo Boxy Fit",
+      "color": "Verde Cemento",
+      "tipo": "buzo",
+      "desc": "Corte cuadrado y tela pesada. Bordado en pecho, estampa grande en espalda.",
+      "precioAntes": 40000,
+      "precioOferta": 35000,
+      "talles": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "fotos": [
+        "img/buzo-boxy-fit-pecho.webp",
+        "img/buzo-boxy-fit-espalda.webp"
+      ],
+      "agotado": true,
+      "badge": "New",
+      "badgeTipo": "b-new",
+      "estrella": false
+    },
+    {
+      "id": 6,
+      "nombre": "Buzo Pasamontañas",
+      "color": "Gris · Detalle cruz en cierre",
+      "tipo": "buzo",
+      "desc": "Capucha total pasamontañas, cierre con dije de cruz. La pieza estrella del drop.",
+      "precioAntes": 55000,
+      "precioOferta": 47000,
+      "talles": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "fotos": [
+        "img/buzo-pasamontañas.webp",
+        "img/buzo-pasamontañas-detalle.webp",
+        "img/idea-outfit-pasamontañas.webp",
+        "img/idea-outfit-pasamontañas1.webp"
+      ],
+      "agotado": false,
+      "badge": "Estrella",
+      "badgeTipo": "b-star",
+      "estrella": true
+    }
+  ],
+  "textos": {
+    "heroTag": "Bariloche, Patagonia — Drop 2026",
+    "heroTitulo": "Tu fit empieza acá",
+    "heroSubtitulo": "Streetwear Argentino · Stock real en Bariloche",
+    "heroDesc": "Lo que está de moda, disponible ahora mismo en Bariloche. Sin esperas, sin excusas.",
+    "anuncio": "🔥 OFERTA OTOÑAL · ENTREGAS EN BARILOCHE Y ENVÍOS A TODO EL PAÍS 🔥",
+    "catTitulo": "Drop 2026",
+    "catDesc": "Prendas seleccionadas por calce, calidad y estilo. Disponibles en Bariloche, entrega en el día.",
+    "wppNumero": "542944229279"
+  }
+}
