@@ -1224,7 +1224,7 @@ async function saveAll() {
     if (res.ok && data.ok) {
       toast('🚀 Publicado en la web — cambios en vivo en ~30 seg');
     } else {
-      toast('⚠️ Error: ' + (data.error || 'No se pudo publicar'), true);
+      toast('⚠️ ' + (data.error || '') + ' ' + (data.detalle || '') + ' status:' + (data.status || ''), true);
     }
   } catch(e) {
     toast('⚠️ Error de conexión al publicar', true);
@@ -1339,3 +1339,5 @@ document.getElementById('modalOverlay').onclick = e => { if (e.target === docume
 </script>
 </body>
 </html>
+
+
