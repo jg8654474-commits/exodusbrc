@@ -95,7 +95,13 @@ exports.handler = async function(event) {
       const errData = await putRes.json().catch(() => ({}));
       return {
         statusCode: putRes.status,
-        body: JSON.stringify({ error: 'Error de GitHub', detalle: errData.message || putRes.statusText })
+        body: JSON.stringify({ 
+          error: 'Error de GitHub', 
+          status: putRes.status,
+          detalle: errData.message || putRes.statusText,
+          url: API_BASE,
+          repo: GITHUB_REPO
+        })
       };
     }
 
@@ -108,4 +114,3 @@ exports.handler = async function(event) {
     return { statusCode: 500, body: JSON.stringify({ error: 'Error al guardar en GitHub', detalle: e.message }) };
   }
 };
-
