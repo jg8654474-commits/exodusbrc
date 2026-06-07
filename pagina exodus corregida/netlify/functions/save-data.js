@@ -49,7 +49,8 @@ exports.handler = async function(event) {
   }
 
   const ARCHIVO = 'datos.json';
-  const API_BASE = `https://api.github.com/repos/${GITHUB_REPO}/contents/${ARCHIVO}`;
+  const REPO_ENCODED = GITHUB_REPO.split('/').map(p => encodeURIComponent(p)).join('/');
+  const API_BASE = `https://api.github.com/repos/${REPO_ENCODED}/contents/${ARCHIVO}`;
   const headers = {
     'Authorization': `Bearer ${GITHUB_TOKEN}`,
     'Accept': 'application/vnd.github+json',
@@ -107,3 +108,4 @@ exports.handler = async function(event) {
     return { statusCode: 500, body: JSON.stringify({ error: 'Error al guardar en GitHub', detalle: e.message }) };
   }
 };
+
