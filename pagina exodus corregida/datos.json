@@ -133,7 +133,7 @@
         "img/idea-outfit-pasamontañas.webp",
         "img/idea-outfit-pasamontañas1.webp"
       ],
-      "agotado": false,
+      "agotado": true,
       "badge": "Estrella",
       "badgeTipo": "b-star",
       "estrella": true
