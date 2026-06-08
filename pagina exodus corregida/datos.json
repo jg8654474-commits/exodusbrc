@@ -17,7 +17,7 @@
       "fotos": [
         "img/ice-baggy.webp"
       ],
-      "agotado": true,
+      "agotado": false,
       "badge": "New",
       "badgeTipo": "b-new",
       "estrella": false
@@ -82,7 +82,7 @@
         "img/baggy-calavera-delantero.webp",
         "img/baggy-calavera-trasero.webp"
       ],
-      "agotado": true,
+      "agotado": false,
       "badge": "New",
       "badgeTipo": "b-new",
       "estrella": false
@@ -130,7 +130,7 @@
         "img/idea-outfit-pasamontañas.webp",
         "img/idea-outfit-pasamontañas1.webp"
       ],
-      "agotado": true,
+      "agotado": false,
       "badge": "Estrella",
       "badgeTipo": "b-star",
       "estrella": true
