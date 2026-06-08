@@ -17,7 +17,7 @@
       "fotos": [
         "img/ice-baggy.webp"
       ],
-      "agotado": false,
+      "agotado": true,
       "badge": "New",
       "badgeTipo": "b-new",
       "estrella": false
@@ -85,7 +85,7 @@
         "img/baggy-calavera-delantero.webp",
         "img/baggy-calavera-trasero.webp"
       ],
-      "agotado": false,
+      "agotado": true,
       "badge": "New",
       "badgeTipo": "b-new",
       "estrella": false
