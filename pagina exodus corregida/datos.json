@@ -17,7 +17,7 @@
       "fotos": [
         "img/ice-baggy.webp"
       ],
-      "agotado": false,
+      "agotado": true,
       "badge": "New",
       "badgeTipo": "b-new",
       "estrella": false
@@ -31,7 +31,10 @@
       "precioAntes": 40000,
       "precioOferta": 35000,
       "talles": [
-        "42"
+        "38",
+        "40",
+        "42",
+        "44"
       ],
       "fotos": [
         "img/baggy-raven.webp"
@@ -59,7 +62,7 @@
         "img/baggy-flame-batic-delantero.webp",
         "img/baggy-flame-batic-trasero.webp"
       ],
-      "agotado": true,
+      "agotado": false,
       "badge": "Edición única",
       "badgeTipo": "b-new",
       "estrella": false
