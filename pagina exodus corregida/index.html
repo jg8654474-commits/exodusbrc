@@ -2920,20 +2920,20 @@ document.querySelectorAll('.carrusel').forEach(function(car) {
       }, { passive: true });
     });
 
-    // ── Re-conectar botones de compra con el modal de talles ──
-    grid.querySelectorAll('.btn[data-admin-talles]').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        var talles = JSON.parse(btn.getAttribute('data-admin-talles') || '[]');
-        var prod = {
-          nombre:    btn.getAttribute('data-admin-nombre'),
-          color:     btn.getAttribute('data-admin-color'),
-          precio:    btn.getAttribute('data-admin-precio'),
-          precioNum: parseInt(btn.getAttribute('data-admin-precio-num')),
-          talles:    talles
-        };
-        if (typeof openTalleModal === 'function') openTalleModal(prod);
-      });
+    // ── Re-conectar botones de compra con event delegation ──
+    grid.addEventListener('click', function(e) {
+      var btn = e.target.closest('.btn[data-admin-talles]');
+      if (!btn) return;
+      e.preventDefault();
+      var talles = JSON.parse(btn.getAttribute('data-admin-talles') || '[]');
+      var prod = {
+        nombre:    btn.getAttribute('data-admin-nombre'),
+        color:     btn.getAttribute('data-admin-color'),
+        precio:    btn.getAttribute('data-admin-precio'),
+        precioNum: parseInt(btn.getAttribute('data-admin-precio-num')),
+        talles:    talles
+      };
+      if (typeof openTalleModal === 'function') openTalleModal(prod);
     });
 
     // ── Re-aplicar filtros si existen ──
@@ -2963,5 +2963,3 @@ document.querySelectorAll('.carrusel').forEach(function(car) {
 
 </body>
 </html>
-
-      
